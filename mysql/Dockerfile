@@ -16,9 +16,9 @@ ADD static_files/opt/iredmail /opt/iredmail
 # All-in-one installation
 RUN yum install -y mariadb-server openssl \
     && curl -o /usr/bin/gosu -SL "https://github.com/tianon/gosu/releases/download/${GOSU_VERSION}/gosu-amd64" \
-    && chmod +x /usr/bin/gosu \
+    && chmod +x /usr/bin/gosu
     # Start temporary MariaDB server
-    && mysql_install_db  --datadir=/var/lib/mysql --skip-name-resolve --force \
+RUN mysql_install_db  --datadir=/var/lib/mysql --skip-name-resolve --force \
     && chown mysql:mysql /var/lib/mysql -R \
     && mysqld_safe & while ! mysqladmin ping --silent; do sleep 1; done \
     && echo "SELECT 1;"  | mysql \
@@ -41,9 +41,20 @@ RUN yum install -y mariadb-server openssl \
        AUTO_CLEANUP_RESTART_POSTFIX=n \
        bash iRedMail.sh \
     && yum install -y supervisor MySQL-python python-webpy \
+    # Remove iredadmin and sogo from backup
+    && sed -i 's/export DATABASES='\''mysql vmail roundcubemail amavisd iredadmin sogo iredapd sa_bayes'\''/export DATABASES='\''mysql vmail roundcubemail amavisd iredapd sa_bayes'\''/' /var/vmail/backup/backup_mysql.sh \
+    && sed -i 's/^\${CMD_MYSQL} iredadmin -e /#\${CMD_MYSQL} iredadmin -e /' /var/vmail/backup/backup_mysql.sh \
+    # Update database for PostfixAdmin
+    && mysql vmail < /opt/iredmail/migrations/vmail/postfixadmin.sql \
+    # Update php
+    && yum install -y yum-utils \
+    && yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm \
+    && yum install -y http://rpms.remirepo.net/enterprise/remi-release-7.rpm \
+    && yum-config-manager --enable remi-php73 \
+    && yum update -y php php* \
     # Remove all dependencies and all caches
     && mkdir dumps \
-    && for d in amavisd iredadmin iredapd roundcubemail sogo vmail mysql; do mysqldump $d | gzip -c > dumps/${d}.sql.gz; done \
+    && for d in amavisd iredapd roundcubemail vmail mysql; do mysqldump $d | gzip -c > dumps/${d}.sql.gz; done \
     && yum clean all \
     && find /var/cache/yum/ -type f -exec rm -f {} \; \
     && rm /var/lib/mysql -rf \
@@ -55,6 +66,20 @@ RUN yum install -y mariadb-server openssl \
     && rm -f /var/lib/dkim/DOMAIN.pem \
     # Prepare for first run
     && rm -rf /var/vmail
+    
+    # Install Postfixadmin
+RUN wget -q -O - "https://sourceforge.net/projects/postfixadmin/files/postfixadmin-3.3.5/PostfixAdmin%203.3.5%20-%20bug%20fix.tar.gz/download" | tar -xzf - -C /opt/www \
+    && mv /opt/www/postfixadmin-postfixadmin-96a0227 /opt/www/postfixadmin-3.3.5 \
+    && mkdir /opt/www/postfixadmin-3.3.5/templates_c \
+    && chown nginx:nginx /opt/www/postfixadmin-3.3.5/templates_c \
+    && ln -s /opt/www/postfixadmin-3.3.5 /opt/www/postfixadmin
+    
+    # Install additional roundcube plugins
+RUN cd /opt/www/roundcubemail-1.4.7 \
+    && curl -s https://getcomposer.org/installer | php \
+    && php composer.phar remove roundcube/plugin-installer \
+    && php composer.phar require roundcube/plugin-installer \
+    && echo "Y" | php composer.phar require roundcube/carddav
 
 # At this point the layer contains services configured by iRedMail installer
 # However, some configurations need to be adapted, so the software composition
@@ -74,5 +99,5 @@ CMD ["supervisord"]
 EXPOSE 80 443 25 587 110 143 993 995
 
 # Default values changable at startup
-ENV SOGO_WORKERS=2
+#ENV SOGO_WORKERS=2
 ENV TZ=Etc/UTC

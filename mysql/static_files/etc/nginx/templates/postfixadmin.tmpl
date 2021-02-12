@@ -1,0 +1,14 @@
+# Settings for PostfixAdmin.
+
+location ~ ^/mailadmin(.*)\.php$ {
+    include /etc/nginx/templates/hsts.tmpl;
+    include /etc/nginx/templates/fastcgi_php.tmpl;
+    fastcgi_param SCRIPT_FILENAME /opt/www/postfixadmin/public$1.php;
+}
+
+location ~ ^/mailadmin(.*) {
+    alias /opt/www/postfixadmin/public$1;
+    index index.php;
+}
+
+location ~ ^/mailadmin/(bin|SQL|README|INSTALL|LICENSE|CHANGELOG|UPGRADING)$ { deny all; }

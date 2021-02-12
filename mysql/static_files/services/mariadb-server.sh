@@ -93,7 +93,7 @@ EOF
 
     # Import initial structures
     DOMAIN=$(hostname -d)
-    for dbname in amavisd iredadmin iredapd roundcubemail vmail sogo; do 
+    for dbname in amavisd iredapd roundcubemail vmail; do 
         i="/opt/iredmail/dumps/${dbname}.sql.gz"
         if [ "${dbname}" == "mysql" ]; then
             continue
@@ -122,15 +122,9 @@ EOF
     -- amavisd
     CREATE USER 'amavisd'@'localhost' IDENTIFIED BY '${AMAVISD_DB_PASSWD}' ;
     GRANT ALL ON *.* TO 'amavisd'@'localhost' WITH GRANT OPTION ;
-    -- iredadmin
-    CREATE USER 'iredadmin'@'localhost' IDENTIFIED BY '${IREDADMIN_DB_PASSWD}' ;
-    GRANT ALL ON *.* TO 'iredadmin'@'localhost' WITH GRANT OPTION ;
     -- roundcube
     CREATE USER 'roundcube'@'localhost' IDENTIFIED BY '${RCM_DB_PASSWD}' ;
     GRANT ALL ON *.* TO 'roundcube'@'localhost' WITH GRANT OPTION ;
-    -- sogo
-    CREATE USER 'sogo'@'localhost' IDENTIFIED BY '${SOGO_DB_PASSWD}' ;
-    GRANT ALL ON *.* TO 'sogo'@'localhost' WITH GRANT OPTION ;
     -- iredapd
     CREATE USER 'iredapd'@'localhost' IDENTIFIED BY '${IREDAPD_DB_PASSWD}' ;
     GRANT ALL ON *.* TO 'iredapd'@'localhost' WITH GRANT OPTION ;    
@@ -156,6 +150,10 @@ CREATE TABLE versions (
 INSERT INTO versions VALUES('iredmail', '${PROG_VERSION}');
 EOF
 
+    # Update database for PostfixAdmin
+    #echo "** Installing postfixadmin.sql"
+    #mysql vmail < /opt/iredmail/migrations/vmail/postfixadmin.sql
+
 else
     ### Update passwords for technical accounts
     echo "*** Updating password credentials"
@@ -178,9 +176,7 @@ EOF
     SET PASSWORD FOR 'vmail'@'localhost' = PASSWORD('$VMAIL_DB_BIND_PASSWD');
     SET PASSWORD FOR 'vmailadmin'@'localhost' = PASSWORD('$VMAIL_DB_ADMIN_PASSWD');
     SET PASSWORD FOR 'amavisd'@'localhost' = PASSWORD('$AMAVISD_DB_PASSWD');
-    SET PASSWORD FOR 'iredadmin'@'localhost' = PASSWORD('$IREDADMIN_DB_PASSWD');
     SET PASSWORD FOR 'roundcube'@'localhost' = PASSWORD('$RCM_DB_PASSWD');
-    SET PASSWORD FOR 'sogo'@'localhost' = PASSWORD('$SOGO_DB_PASSWD');
     SET PASSWORD FOR 'iredapd'@'localhost' = PASSWORD('$IREDAPD_DB_PASSWD');
     FLUSH PRIVILEGES;
 EOF
