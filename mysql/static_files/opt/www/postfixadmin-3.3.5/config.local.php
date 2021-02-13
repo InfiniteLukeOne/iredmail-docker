@@ -9,7 +9,7 @@ $CONF['database_user'] = 'vmailadmin';
 $CONF['database_password'] = 'TEMP_VMAIL_DB_ADMIN_PASSWD';
 $CONF['database_name'] = 'vmail';
 
-$CONF['encrypt'] = 'md5crypt';
+$CONF['encrypt'] = 'php_crypt:BLOWFISH';
 
 // Default Aliases
 // The default aliases that need to be created for all domains.
@@ -34,3 +34,7 @@ $CONF['footer_link'] = 'http://TEMP_DOMAIN';
 $CONF['show_custom_domains']=array('TEMP_DOMAIN');
 $CONF['show_custom_colors']=array("lightgreen");
 
+$CONF['smtp_server'] = '127.0.0.1';
+$CONF['smtp_port'] = '25';
+
+$CONF['create_mailbox_subdirs_host']='127.0.0.1';

@@ -9,7 +9,7 @@ HOSTNAME=$(hostname -s)
 
 . /opt/iredmail/.cv
 
-POSTMASTER_ADMIN_PASSWORD=$(echo $POSTMASTER_PASSWORD | sed 's/{MD5-CRYPT}//')
+POSTMASTER_ADMIN_PASSWORD=$(echo $POSTMASTER_PASSWORD | sed -r 's/\{[-.a-zA-Z0-9]+}//')
 echo "UPDATE admin SET username = 'postmaster@$DOMAIN' WHERE username = 'postmaster@DOMAIN'" | mysql vmail
 echo "UPDATE admin SET password = '$POSTMASTER_ADMIN_PASSWORD' WHERE username = 'postmaster@${DOMAIN}'" | mysql vmail
 echo "INSERT INTO domain VALUES ('$DOMAIN','',NULL,0,0,0,0,0,'',0,NULL,'2018-01-27 10:56:53','2018-01-27 10:56:53','9999-12-31 00:00:00',1,0) WHERE NOT EXISTS (SELECT 1 FROM `domain` WHERE `domain` = '$DOMAIN')" | mysql vmail
