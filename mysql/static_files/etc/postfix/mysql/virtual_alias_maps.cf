@@ -1,0 +1,5 @@
+hosts       = 127.0.0.1:3306
+user        = vmail
+password    = TEMP_VMAIL_DB_BIND_PASSWD
+dbname      = vmail
+query       = (SELECT forwardings.forwarding FROM forwardings,domain WHERE forwardings.address='%s' AND forwardings.domain=domain.domain AND forwardings.active=1 AND domain.backupmx=0 AND domain.active=1) UNION (SELECT alias.goto FROM alias,domain WHERE alias.address='%s' AND alias.domain=domain.domain AND alias.active=1 AND domain.backupmx=0 AND domain.active=1)
