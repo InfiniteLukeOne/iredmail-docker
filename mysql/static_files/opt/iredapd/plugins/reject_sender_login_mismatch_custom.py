@@ -280,8 +280,8 @@ def restriction(**kwargs):
                 # Get per-user alias addresses
                 sql = """SELECT address
                            FROM alias
-                          WHERE address=%s AND goto=%s AND active=1
-                          LIMIT 1""" % (sqlquote(sender), sqlquote(real_sasl_username))
+                          WHERE (address=%s OR address=%s) AND goto=%s AND active=1
+                          LIMIT 1""" % (sqlquote(sender), sqlquote('@' + sender_domain), sqlquote(real_sasl_username))
                 logger.debug('[SQL] query per-user alias address: \n%s' % sql)
 
                 qr = conn.execute(sql)
