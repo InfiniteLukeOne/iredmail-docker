@@ -22,7 +22,7 @@ docker run -p 80:80 -p 443:443 \
            -e "MYSQL_ROOT_PASSWORD=password" \
            -e "TZ=Europe/Prague" \
            -e "POSTMASTER_PASSWORD={PLAIN}password" \
-           -e "IREDAPD_PLUGINS=['reject_null_sender', 'reject_sender_login_mismatch', 'greylisting', 'throttle', 'amavisd_wblist', 'sql_alias_access_policy']" \
+           -e "IREDAPD_PLUGINS=['reject_null_sender', 'reject_sender_login_mismatch_custom', 'greylisting', 'throttle', 'amavisd_wblist', 'sql_alias_access_policy']" \
            -v /srv/iredmail/mysql:/var/lib/mysql \
            -v /srv/iredmail/vmail:/var/vmail \
            -v /srv/iredmail/clamav:/var/lib/clamav \
