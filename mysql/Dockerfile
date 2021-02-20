@@ -40,7 +40,7 @@ RUN mysql_install_db  --datadir=/var/lib/mysql --skip-name-resolve --force \
        AUTO_CLEANUP_REPLACE_MYSQL_CONFIG=y \
        AUTO_CLEANUP_RESTART_POSTFIX=n \
        bash iRedMail.sh \
-    && yum install -y supervisor MySQL-python python-webpy \
+    && yum install -y supervisor MySQL-python python-webpy fail2ban \
     # Remove iredadmin and sogo from backup
     && sed -i 's/export DATABASES='\''mysql vmail roundcubemail amavisd iredadmin sogo iredapd sa_bayes'\''/export DATABASES='\''mysql vmail roundcubemail amavisd iredapd sa_bayes'\''/' /var/vmail/backup/backup_mysql.sh \
     && sed -i 's/^\${CMD_MYSQL} iredadmin -e /#\${CMD_MYSQL} iredadmin -e /' /var/vmail/backup/backup_mysql.sh \
