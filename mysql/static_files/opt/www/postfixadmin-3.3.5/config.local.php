@@ -9,7 +9,7 @@ $CONF['database_user'] = 'vmailadmin';
 $CONF['database_password'] = 'TEMP_VMAIL_DB_ADMIN_PASSWD';
 $CONF['database_name'] = 'vmail';
 
-$CONF['encrypt'] = 'php_crypt:BLOWFISH';
+$CONF['encrypt'] = 'php_crypt:SHA512:200000:{SHA512-CRYPT}';
 
 // Default Aliases
 // The default aliases that need to be created for all domains.
