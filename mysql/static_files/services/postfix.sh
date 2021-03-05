@@ -32,6 +32,7 @@ if [ ! -d /var/vmail/backup ] && [ ! -d /var/vmail/vmail1/${DOMAIN} ]; then
     sed -i "/Username:[ \t]roundcube/{n;s/Password:[ \t]*.*/Password: \"${RCM_DB_PASSWD}\"/}" ${FILES}
     sed -i "/Database user:[ \t]*sogo/{n;s/Database password:[ \t]*.*/Database password: \"${SOGO_DB_PASSWD}\"/}" ${FILES}
     sed -i "/username:[ \t]*sogo_sieve_master@not-exist\.com/{n;s/password:[ \t]*.*/password: \"${SOGO_SIEVE_MASTER_PASSWD}\"/}" ${FILES}
+    perl -0777 -pi -e "/^dkim\._domainkey\.domain\.\s+3600\s+TXT\s+\(\s+\"v=DKIM1; p=\"\s+\"[\w\/+]+\"\s+\"[\w\/+]+\"\s+\"[\w\/+]+\"\s+\"[\w\/+]+\"\s+\"[\w\/+]+\"\s+\"[\w\/+]+\"\s+\"[\w\/+]+\"\)$/${amavisd showkeys}/m" ${FILES}
     # TODO: needs to be resolved after amavis is implemented
     # for file in $FILES; do
         # /bin/echo -e "$(sed '/DNS record for DKIM support:/q' ${file})\n$(amavisd-new showkeys)\n\n$(sed -ne '/Amavisd-new:/,$ p' ${file})" > ${file}
@@ -39,6 +40,7 @@ if [ ! -d /var/vmail/backup ] && [ ! -d /var/vmail/vmail1/${DOMAIN} ]; then
     FILES="${FILES} ${MAILDIR}/links.eml ${MAILDIR}/mua.eml ${MAILDIR}/details.eml"
     sed -i "s/DOMAIN/${DOMAIN}/g" ${FILES}
     sed -i "s/HOSTNAME/${HOSTNAME}/g" ${FILES}
+    sed -i "s/^.*CalDAV.*$//g" ${MAILDIR}/mua.eml
 fi
 
 FILES="resolv.conf hosts"
