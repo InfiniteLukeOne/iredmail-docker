@@ -79,10 +79,14 @@ RUN cd /opt/www/roundcubemail-1.4.7 \
     && curl -s https://getcomposer.org/installer | php \
     && php composer.phar remove roundcube/plugin-installer \
     && php composer.phar require roundcube/plugin-installer \
-    && sed -i "s/^\$config\['password_dovecotpw_method'\].*$/\$config['password_dovecotpw_method'] = 'SHA512-CRYPT';/g" /opt/www/roundcubemail-1.4.7/plugins/password/config.inc.php \
-    && sed -i "s/^\$config\['password_crypt_rounds'\].*$/\$config['password_crypt_rounds'] = 200000;/g" /opt/www/roundcubemail-1.4.7/plugins/password/config.inc.php \
-    && sed -i "s/^\$config\['plugins'\].*$/\$config['plugins'] = array('managesieve', 'password', 'enigma', 'emoticons', 'identity_select', 'vcard_attachments', 'carddav');/g" /opt/www/roundcubemail-1.4.7/config/config.inc.php \
+    && sed -i "s/^\$config\['password_dovecotpw_method'\].*$/\$config['password_dovecotpw_method'] = 'SHA512-CRYPT';/" /opt/www/roundcubemail-1.4.7/plugins/password/config.inc.php \
+    && sed -i "s/^\$config\['password_crypt_rounds'\].*$/\$config['password_crypt_rounds'] = 200000;/" /opt/www/roundcubemail-1.4.7/plugins/password/config.inc.php \
+    && sed -i "s/^\$config\['plugins'\].*$/\$config['plugins'] = array('managesieve', 'password', 'enigma', 'emoticons', 'identity_select', 'vcard_attachments', 'carddav');/" /opt/www/roundcubemail-1.4.7/config/config.inc.php \
     && echo "Y" | php composer.phar require roundcube/carddav
+
+    # Add multi domain dkim support
+RUN sed -i "s/^dkim_key('DOMAIN'/dkim_key('*'/" /etc/amavisd/amavisd.conf \
+    && sed -i -r "s/^(\s+)'\.' => \{d => 'DOMAIN',/\1'.' => {/" /etc/amavisd/amavisd.conf
 
 # At this point the layer contains services configured by iRedMail installer
 # However, some configurations need to be adapted, so the software composition
