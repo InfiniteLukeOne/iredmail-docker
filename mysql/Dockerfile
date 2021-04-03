@@ -86,7 +86,7 @@ RUN cd /opt/www/roundcubemail-1.4.7 \
 
     # Add multi domain dkim support
 RUN sed -i "s/^dkim_key('DOMAIN'/dkim_key('*'/" /etc/amavisd/amavisd.conf \
-    && sed -i -r "s/^(\s+)'\.' => \{d => 'DOMAIN',/\1'.' => {/" /etc/amavisd/amavisd.conf
+    && perl -pi -e "s/^(\s+)'\.' => \{d => 'DOMAIN',/\1'.' => {/" /etc/amavisd/amavisd.conf
 
 # At this point the layer contains services configured by iRedMail installer
 # However, some configurations need to be adapted, so the software composition
